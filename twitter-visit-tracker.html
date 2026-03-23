@@ -325,6 +325,7 @@
   <span>👸🏻</span>
   <div>
     <h1>✨ 공주들을 위한 가정방문 트래커 ✨</h1>
+
   </div>
 </div>
 
@@ -340,11 +341,11 @@
   <div id="tab-friends" class="section active">
     <!-- CSV 가져오기 카드 -->
     <div class="card" style="border-color: var(--accent2); background: linear-gradient(135deg, #1a1d27, #22182e)">
-      <div class="section-title">📥 팔로워 목록 일괄 가져오기</div>
+      <div class="section-title">📥 팔로워 목록 일괄 가져오기 <span style="font-size:0.78rem;color:var(--red);font-weight:500">*인증된 팔로워 기준*</span></div>
       <ol style="font-size:0.78rem;color:var(--text2);margin-bottom:14px;padding-left:18px;line-height:2">
         <li>PC 버전 트위터로 접속 후, 인증된 팔로워 창으로 이동</li>
         <li>인터넷 검색창에 입력: <code style="background:var(--surface2);padding:3px 8px;border-radius:4px;font-size:0.78rem;color:#ffffff;font-family:'Noto Sans KR',sans-serif;letter-spacing:0">https://x.com/공주님들 트위터 아이디/verified_followers</code></li>
-        <li>위 화면이 뜨는지 확인 후, 콘솔 스크립트 추출 <span style="color:var(--accent2)">(윅상궁 1번 파일 참조)</span></li>
+        <li>F12 &gt; Console 스크립트에서 리스트 추출 (twitter-extract.js 파일 복붙)</li>
         <li>다운로드 폴더에 자동으로 저장된 파일 업로드 <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:0.78rem;color:#ffffff;font-family:'Noto Sans KR',sans-serif">(ex : twitter-followers.csv)</code></li>
       </ol>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -545,9 +546,10 @@ function daysSince(dateStr) {
 
 function visitStatus(days) {
   if (days === null) return { cls: 'badge-gray', label: '미방문' };
-  if (days <= 30) return { cls: 'badge-green', label: `${days}일 전` };
-  if (days <= 90) return { cls: 'badge-yellow', label: `${days}일 전` };
-  return { cls: 'badge-red', label: `${days}일 전` };
+  if (days === 0) return { cls: 'badge-green', label: '오늘 방문' };
+  if (days <= 7) return { cls: 'badge-green', label: `D+${days}` };
+  if (days <= 30) return { cls: 'badge-yellow', label: `D+${days}` };
+  return { cls: 'badge-red', label: `D+${days}` };
 }
 
 function renderFriends() {
@@ -575,7 +577,7 @@ function renderFriends() {
       <div class="avatar" style="background:${color}22;color:${color}">${getInitial(f.name)}</div>
       <div class="friend-info">
         <div class="friend-name">${f.name} <span class="badge ${status.cls}">${status.label}</span></div>
-        <div class="friend-handle" onclick="copyHandle(this, '${f.handle}')">${f.handle || '핸들 미등록'}<span class="copy-hint">복사</span></div>
+        <div class="friend-handle" onclick="copyHandle('${f.handle}')" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px" title="클릭해서 복사">${f.handle || '핸들 미등록'} <span style="font-size:0.7rem;opacity:0.5">복사</span></div>
         <div class="friend-meta">총 ${cnt}회 방문${f.memo ? ` &nbsp;·&nbsp; ${f.memo}` : ''}</div>
       </div>
       <div class="friend-actions">
@@ -625,6 +627,7 @@ function quickVisit(friendId, checkbox) {
     card.classList.remove('visited');
   }
   save();
+  renderFriends();
 }
 
 // 체크됐는데 방문기록 없는 친구들 일괄 생성
