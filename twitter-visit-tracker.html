@@ -475,12 +475,12 @@
 
 <script>
 // ====== DATA ======
-// 세션 메모리 전용 — localStorage 미사용 (링크 공유시 누구나 빈 상태로 시작)
+// 세션 메모리 전용 — localStorage 미사용 (공유 링크용: 누구나 빈 상태로 시작)
 let friends = [];
 let visits = [];
 
 function save() {
-  // 저장 없음: 새로고침하면 초기화됨 (공유 링크 용도)
+  // 저장 없음 — 새로고침하면 초기화 (공유 링크 용도)
 }
 
 // ====== TABS ======
@@ -625,6 +625,7 @@ function quickVisit(friendId, checkbox) {
     card.classList.remove('visited');
   }
   save();
+  renderFriends(); // 총 n회 방문, 배지(D+1 등) 즉시 갱신
 }
 
 // 체크됐는데 방문기록 없는 친구들 일괄 생성
