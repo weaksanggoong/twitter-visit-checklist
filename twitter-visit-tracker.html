@@ -180,6 +180,19 @@
   .friend-handle .copy-hint { font-size: 0.68rem; opacity: 0; transition: opacity 0.15s; }
   .friend-handle:hover .copy-hint { opacity: 0.7; }
   .friend-handle.copied { color: var(--green) !important; }
+  .friend-handle-row { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+  .x-link-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    background: rgba(139,145,176,0.15);
+    color: var(--text2);
+    font-size: 0.72rem;
+    text-decoration: none;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .x-link-btn:hover { background: rgba(96,165,250,0.2); color: #60a5fa; }
   .friend-meta { font-size: 0.78rem; color: var(--text2); margin-top: 4px; }
   .friend-actions { display: flex; gap: 8px; flex-shrink: 0; }
   .badge {
@@ -650,7 +663,10 @@ function renderFriends() {
       <div class="avatar" style="background:${color}22;color:${color}">${getInitial(f.name)}</div>
       <div class="friend-info">
         <div class="friend-name">${f.name} <span class="badge ${status.cls}">${status.label}</span></div>
-        <div class="friend-handle" onclick="copyHandle(this, '${f.handle}')">${f.handle || '핸들 미등록'}<span class="copy-hint">복사</span></div>
+        <div class="friend-handle-row">
+          <div class="friend-handle" onclick="copyHandle(this, '${f.handle}')">${f.handle || '핸들 미등록'}<span class="copy-hint">복사</span></div>
+          ${f.handle ? `<a href="https://x.com/${f.handle.replace(/^@/, '')}" target="_blank" class="x-link-btn" title="X 프로필 열기" onclick="event.stopPropagation()">↗</a>` : ''}
+        </div>
         <div class="friend-meta">총 ${cnt}회 방문${f.memo ? ` &nbsp;·&nbsp; ${f.memo}` : ''}</div>
       </div>
       <div class="friend-actions">
