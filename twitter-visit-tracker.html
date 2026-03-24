@@ -857,6 +857,9 @@ function addVisit() {
   const date = document.getElementById('v-date').value;
   if (!friendId) { alert('친구를 선택해 주세요!'); return; }
   if (!date) { alert('날짜를 입력해 주세요!'); return; }
+  if (visits.some(v => v.friendId === friendId && v.date === date)) {
+    alert('이미 해당 날짜에 방문 기록이 있어요!'); return;
+  }
   const visit = {
     id: Date.now().toString(),
     friendId,
@@ -1240,6 +1243,9 @@ function saveModalVisit() {
   const friendId = document.getElementById('modal-friend-id').value;
   const date = document.getElementById('modal-date').value;
   if (!date) { alert('날짜를 선택해 주세요!'); return; }
+  if (visits.some(v => v.friendId === friendId && v.date === date)) {
+    alert('이미 해당 날짜에 방문 기록이 있어요!'); return;
+  }
   const visit = {
     id: Date.now().toString(),
     friendId,
