@@ -622,7 +622,7 @@ function resetFriends() {
 function addFriend() {
   const name = document.getElementById('f-name').value.trim();
   const handle = document.getElementById('f-handle').value.trim();
-  if (!name) { alert('이름을 입력해줘!'); return; }
+  if (!name) { alert('이름을 입력해 주세요!'); return; }
 
   // 중복 체크 (아이디 또는 닉네임 기준)
   const normalHandle = handle.replace(/^@/, '').toLowerCase();
@@ -666,7 +666,11 @@ function saveExcludeReason(id, reason) {
 function restoreFriend(id) {
   const friend = excluded.find(f => f.id === id);
   if (!friend) return;
-  friends.push(friend);
+  // 이미 친구 목록에 있으면 추가하지 않음 (중복 방지)
+  if (!friends.some(f => f.id === id)) {
+    const { excludeReason, ...cleanFriend } = friend;
+    friends.push(cleanFriend);
+  }
   excluded = excluded.filter(f => f.id !== id);
   save();
   renderFriends();
@@ -787,7 +791,7 @@ function fixMissingVisitRecords() {
     }
   });
   if (cnt > 0) { save(); alert(`✅ ${cnt}명 방문기록 생성 완료!`); }
-  else alert('이미 모두 기록이 있어!');
+  else alert('이미 모두 오늘 방문 기록이 있어요!');
 }
 
 // ====== VISITS ======
@@ -851,8 +855,8 @@ document.addEventListener('click', function(e) {
 function addVisit() {
   const friendId = document.getElementById('v-friend').value;
   const date = document.getElementById('v-date').value;
-  if (!friendId) { alert('친구를 선택해줘!'); return; }
-  if (!date) { alert('날짜를 입력해줘!'); return; }
+  if (!friendId) { alert('친구를 선택해 주세요!'); return; }
+  if (!date) { alert('날짜를 입력해 주세요!'); return; }
   const visit = {
     id: Date.now().toString(),
     friendId,
@@ -899,7 +903,7 @@ function renderVisits() {
   // 검색 조건 없으면 안 보여줌
   if (!filterFriend && !dateFrom && !dateTo) {
     if (countEl) countEl.textContent = '';
-    list.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div>친구를 검색하거나 조회기준을 선택해줘</div></div>`;
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div>친구를 검색하거나 조회기준을 선택해 주세요</div></div>`;
     return;
   }
 
@@ -1235,7 +1239,7 @@ function closeModal() {
 function saveModalVisit() {
   const friendId = document.getElementById('modal-friend-id').value;
   const date = document.getElementById('modal-date').value;
-  if (!date) { alert('날짜를 선택해줘!'); return; }
+  if (!date) { alert('날짜를 선택해 주세요!'); return; }
   const visit = {
     id: Date.now().toString(),
     friendId,
