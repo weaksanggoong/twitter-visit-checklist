@@ -663,6 +663,31 @@ function saveExcludeReason(id, reason) {
   if (f) { f.excludeReason = reason; save(); }
 }
 
+function toggleReasonEdit(id) {
+  const input = document.getElementById('reason-input-' + id);
+  const btn = document.getElementById('reason-btn-' + id);
+  if (!input || !btn) return;
+  if (input.disabled) {
+    // 수정 모드로 전환
+    input.disabled = false;
+    input.style.opacity = '1';
+    input.style.borderColor = 'var(--accent)';
+    input.focus();
+    btn.textContent = '저장';
+    btn.style.background = 'var(--accent)';
+    btn.style.color = '#fff';
+  } else {
+    // 저장 후 잠금
+    saveExcludeReason(id, input.value);
+    input.disabled = true;
+    input.style.opacity = '0.6';
+    input.style.borderColor = 'var(--border)';
+    btn.textContent = '수정';
+    btn.style.background = '';
+    btn.style.color = '';
+  }
+}
+
 function restoreFriend(id) {
   const friend = excluded.find(f => f.id === id);
   if (!friend) return;
@@ -1172,9 +1197,10 @@ function renderExcluded() {
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:0.75rem;color:var(--text2);white-space:nowrap;flex-shrink:0">🚫 제외 사유</span>
-        <input type="text" value="${reason.replace(/"/g,'&quot;')}" placeholder="제외 사유를 입력해 주세요 (선택)"
-          style="flex:1;font-size:0.78rem;padding:6px 10px;height:auto;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text)"
-          oninput="saveExcludeReason('${f.id}', this.value)">
+        <input type="text" id="reason-input-${f.id}" value="${reason.replace(/"/g,'&quot;')}" placeholder="제외 사유를 입력해 주세요 (선택)"
+          style="flex:1;font-size:0.78rem;padding:6px 10px;height:auto;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);opacity:0.6"
+          disabled>
+        <button id="reason-btn-${f.id}" class="btn btn-secondary btn-sm" style="font-size:0.75rem;white-space:nowrap;flex-shrink:0" onclick="toggleReasonEdit('${f.id}')">수정</button>
       </div>
     </div>`;
   }).join('');
