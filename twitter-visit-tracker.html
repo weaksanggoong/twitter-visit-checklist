@@ -492,9 +492,10 @@
     <div id="checklist-stats"></div>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
       <label style="font-size:0.8rem;color:var(--text2);font-weight:500">조회기준</label>
-      <input type="date" id="cl-date-from" onchange="renderChecklist()" style="width:auto" placeholder="MM/DD/YYYY">
+      <input type="date" id="cl-date-from" onchange="onChecklistDateChange()" style="width:auto" placeholder="MM/DD/YYYY">
       <span style="color:var(--text2);font-size:0.85rem">~</span>
-      <input type="date" id="cl-date-to" onchange="renderChecklist()" style="width:auto" placeholder="MM/DD/YYYY">
+      <input type="date" id="cl-date-to" onchange="onChecklistDateChange()" style="width:auto" placeholder="MM/DD/YYYY">
+      <button id="btn-today-only" class="btn btn-secondary btn-sm" onclick="setTodayOnly()" style="font-size:0.75rem;white-space:nowrap">📅 오늘만 보기</button>
       <button class="btn btn-secondary btn-sm" onclick="clearChecklistDate()">초기화</button>
     </div>
     <div id="checklist-list"></div>
@@ -955,9 +956,40 @@ function clearDateFilter() {
   renderVisits();
 }
 
+function setTodayOnly() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('cl-date-from').value = today;
+  document.getElementById('cl-date-to').value = today;
+  document.getElementById('btn-today-only').className = 'btn btn-primary btn-sm';
+  document.getElementById('btn-today-only').style.fontSize = '0.75rem';
+  renderChecklist();
+}
+
+function onChecklistDateChange() {
+  // 날짜 직접 변경 시 오늘만 보기 버튼 스타일 초기화
+  const today = new Date().toISOString().split('T')[0];
+  const from = document.getElementById('cl-date-from').value;
+  const to = document.getElementById('cl-date-to').value;
+  const btn = document.getElementById('btn-today-only');
+  if (btn) {
+    if (from === today && to === today) {
+      btn.className = 'btn btn-primary btn-sm';
+    } else {
+      btn.className = 'btn btn-secondary btn-sm';
+    }
+    btn.style.fontSize = '0.75rem';
+  }
+  renderChecklist();
+}
+
 function clearChecklistDate() {
   document.getElementById('cl-date-from').value = '';
   document.getElementById('cl-date-to').value = '';
+  const btn = document.getElementById('btn-today-only');
+  if (btn) {
+    btn.className = 'btn btn-secondary btn-sm';
+    btn.style.fontSize = '0.75rem';
+  }
   renderChecklist();
 }
 
