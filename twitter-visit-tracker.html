@@ -431,6 +431,14 @@
       <input type="text" id="search-friends" placeholder="🔍 닉네임 / 아이디 검색..." oninput="renderFriends()">
     </div>
 
+
+    <div id="friend-sort-bar" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-size:0.78rem;color:var(--text2);font-weight:500">정렬:</span>
+      <button id="sort-unvisited" class="btn btn-secondary btn-sm" onclick="setFriendSort('unvisited')" style="font-size:0.75rem">미방문 먼저 ↑</button>
+      <button id="sort-visited" class="btn btn-secondary btn-sm" onclick="setFriendSort('visited')" style="font-size:0.75rem">방문완료 먼저 ↑</button>
+      <button id="sort-recent" class="btn btn-secondary btn-sm" onclick="setFriendSort('recent')" style="font-size:0.75rem">최근 방문순</button>
+    </div>
+
     <div id="friends-list"></div>
   </div>
 
@@ -724,10 +732,43 @@ function visitStatus(days) {
 function renderFriends() {
   const q = (document.getElementById('search-friends')?.value || '').toLowerCase();
   const list = document.getElementById('friends-list');
-  const filtered = friends.filter(f =>
+  let filtered = friends.filter(f =>
     f.name.toLowerCase().includes(q) ||
     f.handle.toLowerCase().includes(q)
   );
+
+  // 정렬 적용
+  if (friendSort === 'unvisited') {
+    filtered.sort((a, b) => {
+      const av = visits.some(v => v.friendId === a.id);
+      const bv = visits.some(v => v.friendId === b.id);
+      if (av === bv) return 0;
+      return av ? 1 : -1; // 미방문 먼저
+    });
+  } else if (friendSort === 'visited') {
+    filtered.sort((a, b) => {
+      const av = visits.some(v => v.friendId === a.id);
+      const bv = visits.some(v => v.friendId === b.id);
+      if (av === bv) return 0;
+      return av ? -1 : 1; // 방문완료 먼저
+    });
+  } else if (friendSort === 'recent') {
+    filtered.sort((a, b) => {
+      const alv = getLastVisit(a.id);
+      const blv = getLastVisit(b.id);
+      if (!alv && !blv) return 0;
+      if (!alv) return 1;
+      if (!blv) return -1;
+      return new Date(blv.date) - new Date(alv.date); // 최근 방문순
+    });
+  }
+
+  // 정렬 버튼 스타일 업데이트
+  ['unvisited', 'visited', 'recent'].forEach(s => {
+    const btn = document.getElementById('sort-' + s);
+    if (btn) btn.className = (friendSort === s ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm');
+  });
+
   if (!filtered.length) {
     list.innerHTML = `<div class="empty"><div class="empty-icon">👤</div><div>${friends.length ? '검색 결과 없음' : '아직 친구가 없어! 위에서 추가해봐'}</div></div>`;
     return;
@@ -1059,7 +1100,13 @@ function renderChecklist() {
     <div class="check-item" style="${fVisited ? 'background:#0d1e36;border-color:#3b82f633' : ''}">
       <div class="check-dot" style="background:${dotColor}"></div>
       <div class="check-info">
-        <div class="check-name">${f.name} <span style="color:var(--text2);font-weight:400;font-size:0.82rem">${f.handle || ''}</span></div>
+        <div class="check-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span>${f.name}</span>
+          <span style="display:inline-flex;align-items:center;gap:4px">
+            <span style="color:var(--text2);font-weight:400;font-size:0.82rem">${f.handle || ''}</span>
+            ${f.handle ? `<a href="https://x.com/${f.handle.replace(/^@/, '')}" target="_blank" class="x-link-btn" title="X(트위터) 프로필 열기" onclick="event.stopPropagation()" style="width:18px;height:18px;font-size:0.7rem">↗</a>` : ''}
+          </span>
+        </div>
         <div class="check-last">
           ${fVisited ? `✅ 총 ${cnt}회 방문` : '❌ 미방문'}
           ${lv ? `&nbsp;·&nbsp; 마지막: ${days}일 전` : ''}
@@ -1075,7 +1122,13 @@ function renderChecklist() {
 
 // ====== EXCLUDED LIST ======
 // ====== RANKING ======
+let friendSort = 'default'; // 'default' | 'unvisited' | 'visited' | 'recent'
 let rankSort = 'desc';
+
+function setFriendSort(s) {
+  friendSort = friendSort === s ? 'default' : s;
+  renderFriends();
+}
 
 function resetRankDates() {
   document.getElementById('rank-date-from').value = '';
