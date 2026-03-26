@@ -424,11 +424,15 @@
         </div>
       </div>
       <input type="hidden" id="f-location" value="">
-      <button class="btn btn-primary" onclick="addFriend()">추가하기</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-primary" onclick="addFriend()">추가하기</button>
+        <button class="btn btn-secondary btn-sm" onclick="clearAddForm()" style="font-size:0.82rem">✕ 초기화</button>
+      </div>
     </div>
 
     <div class="search-row">
       <input type="text" id="search-friends" placeholder="🔍 닉네임 / 아이디 검색..." oninput="renderFriends()">
+      <button class="btn btn-secondary btn-sm" onclick="clearSearchFriends()" style="font-size:0.82rem;white-space:nowrap">✕ 초기화</button>
     </div>
 
 
@@ -626,6 +630,15 @@ function resetFriends() {
   save();
   document.getElementById('csv-status').textContent = '🗑️ 초기화 완료!';
   renderFriends();
+}
+
+function clearAddForm() {
+  ['f-name','f-handle','f-location','f-memo'].forEach(id => document.getElementById(id).value = '');
+}
+
+function clearSearchFriends() {
+  const el = document.getElementById('search-friends');
+  if (el) { el.value = ''; renderFriends(); }
 }
 
 function addFriend() {
