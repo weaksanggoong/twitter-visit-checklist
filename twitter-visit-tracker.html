@@ -554,6 +554,34 @@
 </div>
 
 <!-- 방문 기록 모달 (친구 목록에서 바로) -->
+<!-- 정보 수정 모달 -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <h2>✏️ 팔로워 정보 수정</h2>
+    <input type="hidden" id="edit-friend-id">
+    <div class="form-row">
+      <div class="form-col">
+        <label>닉네임</label>
+        <input type="text" id="edit-name" placeholder="예: 호랑이짱">
+      </div>
+      <div class="form-col">
+        <label>트위터 아이디</label>
+        <input type="text" id="edit-handle" placeholder="예: @tiger_xxx">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-col" style="min-width:100%">
+        <label>바이오 / 메모 (선택)</label>
+        <input type="text" id="edit-memo" placeholder="예: 고양이 4마리, 20대 직장인">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+      <button class="btn btn-primary" onclick="saveEditFriend()">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="visit-modal">
   <div class="modal">
     <h2>🏠 방문기록 추가</h2>
@@ -800,7 +828,7 @@ function renderFriends() {
       <input type="checkbox" class="visit-checkbox" ${isChecked ? 'checked' : ''} onchange="quickVisit('${f.id}', this)">
       <div class="avatar" style="background:${color}22;color:${color}">${getInitial(f.name)}</div>
       <div class="friend-info">
-        <div class="friend-name">${f.name} <span class="badge ${status.cls}">${status.label}</span></div>
+        <div class="friend-name">${f.name} <span class="badge ${status.cls}">${status.label}</span><span class="badge badge-gray" onclick="openEditModal('${f.id}')" style="cursor:pointer;margin-left:5px;opacity:0.75;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.75'">✏️ 수정</span></div>
         <div class="friend-handle-row">
           <div class="friend-handle" onclick="copyHandle(this, '${f.handle}')">${f.handle || '핸들 미등록'}<span class="copy-hint">복사</span></div>
           ${f.handle ? `<a href="https://x.com/${f.handle.replace(/^@/, '')}" target="_blank" class="x-link-btn" title="X 프로필 열기" onclick="event.stopPropagation()">↗</a>` : ''}
@@ -1350,6 +1378,40 @@ function calNav(dir) {
 }
 
 // ====== MODAL ======
+function openEditModal(friendId) {
+  const f = friends.find(x => x.id === friendId);
+  if (!f) return;
+  document.getElementById('edit-friend-id').value = friendId;
+  document.getElementById('edit-name').value = f.name || '';
+  document.getElementById('edit-handle').value = f.handle || '';
+  document.getElementById('edit-memo').value = f.memo || '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+function saveEditFriend() {
+  const id = document.getElementById('edit-friend-id').value;
+  const name = document.getElementById('edit-name').value.trim();
+  const handle = document.getElementById('edit-handle').value.trim();
+  const memo = document.getElementById('edit-memo').value.trim();
+  if (!name) { alert('닉네임을 입력해 주세요!'); return; }
+  const f = friends.find(x => x.id === id);
+  if (!f) return;
+  f.name = name;
+  f.handle = handle;
+  f.memo = memo;
+  save();
+  closeEditModal();
+  renderFriends();
+}
+
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditModal();
+});
+
 function openModal(friendId) {
   const today = new Date();
   calYear = today.getFullYear();
